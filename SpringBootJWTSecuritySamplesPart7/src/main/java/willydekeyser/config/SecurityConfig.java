@@ -5,7 +5,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,7 +38,7 @@ public class SecurityConfig {
 		return new InMemoryUserDetailsManager(
 				User.withUsername("user")
 					.password("$2a$10$RRo8Z005VQgfGrtnb1Xx8O3k2xyH9ui.N25VUbAUG74Rx0q/oRR0e")
-					.authorities("read")
+					.roles("USER", "ADMIN")
 					.build()
 		);
 	}
@@ -55,7 +54,9 @@ public class SecurityConfig {
 				.csrf(csrt -> csrt.disable())
 				.authorizeRequests(auth -> auth
 						.anyRequest().authenticated())
-				.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+				.oauth2ResourceServer(authorize -> authorize
+						.jwt(jwt -> jwt
+						.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.httpBasic(withDefaults())
 				.build();
