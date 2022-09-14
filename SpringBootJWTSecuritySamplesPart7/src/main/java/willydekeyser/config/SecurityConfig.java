@@ -2,11 +2,15 @@ package willydekeyser.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -31,42 +35,41 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
 
 	private final RsaKeyProperties rsaKeys;
-	
+
 	@Bean
 	public InMemoryUserDetailsManager user() {
 		log.info("BCrypt password: {}", passwordEncoder().encode("password"));
-		return new InMemoryUserDetailsManager(
-				User.withUsername("user")
-					.password("$2a$10$RRo8Z005VQgfGrtnb1Xx8O3k2xyH9ui.N25VUbAUG74Rx0q/oRR0e")
-					.roles("USER", "ADMIN")
-					.build()
-		);
+		List<UserDetails> userDetailsList = new ArrayList<>();
+		userDetailsList.add(User.withUsername("user")
+				.password("$2a$10$RRo8Z005VQgfGrtnb1Xx8O3k2xyH9ui.N25VUbAUG74Rx0q/oRR0e")
+				.roles("USER")
+				.build());
+		userDetailsList.add(User.withUsername("admin")
+				.password("$2a$10$RRo8Z005VQgfGrtnb1Xx8O3k2xyH9ui.N25VUbAUG74Rx0q/oRR0e")
+				.roles("USER", "ADMIN")
+				.build());
+		return new InMemoryUserDetailsManager(userDetailsList);
 	}
-	
+
 	@Bean
 	BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		return http
-				.csrf(csrt -> csrt.disable())
-				.authorizeRequests(auth -> auth
-						.anyRequest().authenticated())
+		return http.csrf(csrt -> csrt.disable()).authorizeRequests(auth -> auth.anyRequest().authenticated())
 				.oauth2ResourceServer(authorize -> authorize
-						.jwt(jwt -> jwt
-						.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())))
+						.jwt(jwt -> jwt.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.httpBasic(withDefaults())
-				.build();
+				.httpBasic(withDefaults()).build();
 	}
-	
+
 	@Bean
 	JwtDecoder jwtDecoder() {
 		return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();
 	}
-	
+
 	@Bean
 	JwtEncoder jwtEncoder() {
 		JWK jwk = new RSAKey.Builder(rsaKeys.publicKey()).privateKey(rsaKeys.privateKey()).build();
