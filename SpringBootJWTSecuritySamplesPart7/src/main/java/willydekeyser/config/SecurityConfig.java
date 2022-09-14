@@ -48,6 +48,10 @@ public class SecurityConfig {
 				.password("$2a$10$RRo8Z005VQgfGrtnb1Xx8O3k2xyH9ui.N25VUbAUG74Rx0q/oRR0e")
 				.roles("ADMIN", "USER")
 				.build());
+		userDetailsList.add(User.withUsername("moderator")
+				.password("$2a$10$RRo8Z005VQgfGrtnb1Xx8O3k2xyH9ui.N25VUbAUG74Rx0q/oRR0e")
+				.roles("MODERATOR", "ADMIN", "USER")
+				.build());
 		return new InMemoryUserDetailsManager(userDetailsList);
 	}
 
@@ -64,6 +68,7 @@ public class SecurityConfig {
 				.authorizeRequests((auth) -> auth
 						.antMatchers("/user").hasAnyAuthority("ROLE_USER")
 						.antMatchers("/admin").hasAuthority("ROLE_ADMIN")
+						.antMatchers("/moderator").hasAuthority("ROLE_MODERATOR")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(authorize -> authorize
 						.jwt(jwt -> jwt.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())))

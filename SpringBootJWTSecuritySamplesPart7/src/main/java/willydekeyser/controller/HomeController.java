@@ -9,11 +9,7 @@ public class HomeController {
 
 	@GetMapping("/")
 	public String home(Authentication authentication) {
-		boolean hasUserRole = authentication.getAuthorities().stream()
-		          .anyMatch(r -> r.getAuthority().equals("ROLE_USER"));
-		boolean hasAdminRole = authentication.getAuthorities().stream()
-		          .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
-		return "Hello, " + authentication.getName() + " - " + authentication.getAuthorities() + " User: " + hasUserRole + " Admin: " + hasAdminRole;
+		return "Hello, " + authentication.getName() + " - " + authentication.getAuthorities();
 	}
 	
 	@GetMapping("/user")
@@ -24,5 +20,10 @@ public class HomeController {
 	@GetMapping("/admin")
 	public String admin(Authentication authentication) {
 		return "Hello Admin, " + authentication.getName() + " - " + authentication.getAuthorities();
+	}
+	
+	@GetMapping("/moderator")
+	public String moderator(Authentication authentication) {
+		return "Hello Moderator, " + authentication.getName() + " - " + authentication.getAuthorities();
 	}
 }
