@@ -14,8 +14,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken>{
 
+	private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+	
 	private Collection<? extends GrantedAuthority> extractResourceRoles(final Jwt jwt) {
-		
 		Collection<GrantedAuthority> authorities = new HashSet<>();
 		authorities.addAll(jwt.getClaimAsStringList("roles")
 				.stream()
@@ -23,8 +24,6 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
 				.toList());
 		return authorities;
 	}
-	
-	private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 	
 	@Override
 	public AbstractAuthenticationToken convert(Jwt source) {
