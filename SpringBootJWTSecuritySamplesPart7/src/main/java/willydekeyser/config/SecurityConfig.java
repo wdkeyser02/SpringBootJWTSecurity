@@ -46,7 +46,7 @@ public class SecurityConfig {
 				.build());
 		userDetailsList.add(User.withUsername("admin")
 				.password("$2a$10$RRo8Z005VQgfGrtnb1Xx8O3k2xyH9ui.N25VUbAUG74Rx0q/oRR0e")
-				.roles("USER", "ADMIN")
+				.roles("ADMIN")
 				.build());
 		return new InMemoryUserDetailsManager(userDetailsList);
 	}
@@ -58,7 +58,13 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		return http.csrf(csrt -> csrt.disable()).authorizeRequests(auth -> auth.anyRequest().authenticated())
+		return http
+				.csrf(csrf -> csrf
+						.disable())
+				.authorizeRequests((auth) -> auth
+						.antMatchers("/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+						.antMatchers("/admin").hasAuthority("ROLE_ADMIN")
+						.anyRequest().authenticated())
 				.oauth2ResourceServer(authorize -> authorize
 						.jwt(jwt -> jwt.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
