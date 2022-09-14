@@ -12,10 +12,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
+
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken>{
 
-	private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-	
 	private Collection<? extends GrantedAuthority> extractResourceRoles(final Jwt jwt) {
 		Collection<GrantedAuthority> authorities = new HashSet<>();
 		authorities.addAll(jwt.getClaimAsStringList("roles")
@@ -25,9 +24,10 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
 		return authorities;
 	}
 	
+	private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+	
 	@Override
 	public AbstractAuthenticationToken convert(Jwt source) {
-		
 		Collection<GrantedAuthority> authorities = Stream
 				.concat(jwtGrantedAuthoritiesConverter
 				.convert(source)

@@ -46,7 +46,7 @@ public class SecurityConfig {
 				.build());
 		userDetailsList.add(User.withUsername("admin")
 				.password("$2a$10$RRo8Z005VQgfGrtnb1Xx8O3k2xyH9ui.N25VUbAUG74Rx0q/oRR0e")
-				.roles("ADMIN")
+				.roles("ADMIN", "USER")
 				.build());
 		return new InMemoryUserDetailsManager(userDetailsList);
 	}
@@ -62,7 +62,7 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf
 						.disable())
 				.authorizeRequests((auth) -> auth
-						.antMatchers("/user").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+						.antMatchers("/user").hasAnyAuthority("ROLE_USER")
 						.antMatchers("/admin").hasAuthority("ROLE_ADMIN")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(authorize -> authorize
@@ -70,7 +70,7 @@ public class SecurityConfig {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.httpBasic(withDefaults()).build();
 	}
-
+	
 	@Bean
 	JwtDecoder jwtDecoder() {
 		return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();

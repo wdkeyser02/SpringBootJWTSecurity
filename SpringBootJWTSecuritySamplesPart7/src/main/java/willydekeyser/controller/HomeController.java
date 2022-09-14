@@ -9,7 +9,11 @@ public class HomeController {
 
 	@GetMapping("/")
 	public String home(Authentication authentication) {
-		return "Hello, " + authentication.getName() + " - " + authentication.getAuthorities();
+		boolean hasUserRole = authentication.getAuthorities().stream()
+		          .anyMatch(r -> r.getAuthority().equals("ROLE_USER"));
+		boolean hasAdminRole = authentication.getAuthorities().stream()
+		          .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+		return "Hello, " + authentication.getName() + " - " + authentication.getAuthorities() + " User: " + hasUserRole + " Admin: " + hasAdminRole;
 	}
 	
 	@GetMapping("/user")
