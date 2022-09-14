@@ -66,7 +66,7 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf
 						.disable())
 				.authorizeRequests((auth) -> auth
-						.antMatchers("/user").hasAnyAuthority("ROLE_USER")
+						.antMatchers("/user").hasAuthority("ROLE_USER")
 						.antMatchers("/admin").hasAuthority("ROLE_ADMIN")
 						.antMatchers("/moderator").hasAuthority("ROLE_MODERATOR")
 						.anyRequest().authenticated())
